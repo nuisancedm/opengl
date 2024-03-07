@@ -48,8 +48,6 @@ int checkShaderProgramLink(unsigned int &shaderProgram) {
 }
 
 int main() {
-    std::cout << "[MESSAGE]: executable launched from file 003" << std::endl;
-
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -72,6 +70,10 @@ int main() {
         std::cout << "Failed to init GLAD!" << std::endl;
         return -1;
     }
+
+    std::cout << glGetString(GL_VERSION) << std::endl;
+    std::cout << "[MESSAGE]: executable launched from file 004" << std::endl;
+
     glViewport(0, 0, 800, 600);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
@@ -114,8 +116,6 @@ int main() {
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    //@@ use EBO(Element Buffer Object) to specify the draw order.
-    //@@ EBO is also a buffer object, same way to create as VBO, it store the drawing index of the vertex.
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -131,10 +131,7 @@ int main() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indice), indice, GL_STATIC_DRAW);
 
-
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    //@@ DONT DO THIS. VAO also record the unbind of EBO, if unbind here, there is no indice in VAO.
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
     while (!glfwWindowShouldClose(window)) {
@@ -144,8 +141,6 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
-        //when we use EBO should call glDrawElements instead.
-        //glDrawArrays(GL_TRIANGLES, 0, 3);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
         glfwSwapBuffers(window);
