@@ -9,6 +9,7 @@ Shader::Shader(const std::string filepath) :
     m_Filepath(filepath), m_RendererID(0) {
     ShaderProgramSource source = ParseShader();
     m_RendererID = CreateShader(source.VectexSource, source.FragmentSource);
+    glUseProgram(m_RendererID);
 }
 
 Shader::~Shader() {
@@ -23,7 +24,7 @@ ShaderProgramSource Shader::ParseShader() {
     };
     std::ifstream stream(m_Filepath);
     if (!stream.is_open()) {
-        throw std::runtime_error("Failed to open file: " + m_Filepath);
+        throw std::runtime_error("Failed to open shader file: " + m_Filepath);
     }
     std::stringstream ss[2];
     ShaderType type = ShaderType::NONE;
@@ -90,8 +91,16 @@ void Shader::bind() const {
 void Shader::unbind() const {
     GLCall(glUseProgram(0));
 };
+
 void Shader::setUniform4f(const std::string &name, float v0, float v1, float v2, float v3) {
     GLCall(glUniform4f(getUniformLocation(name), v0, v1, v2, v3));
+};
+void Shader::setUniform1i(const std::string &name, int v) {
+    GLCall(glUniform1i(getUniformLocation(name), v));
+};
+
+void Shader::setUniform1f(const std::string &name, float v) {
+    GLCall(glUniform1f(getUniformLocation(name), v));
 };
 
 unsigned int Shader::getUniformLocation(const std::string &name) {

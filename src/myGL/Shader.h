@@ -9,9 +9,10 @@ struct ShaderProgramSource {
 class Shader {
 private:
     std::string m_Filepath;
-    unsigned int m_RendererID;
+    
     //@@ caching for unifrom
 public:
+    unsigned int m_RendererID;
     Shader(const std::string filepath);
     ~Shader();
 
@@ -20,6 +21,8 @@ public:
 
     //@@ set uniform
     void setUniform4f(const std::string &name, float v0, float v1, float v2, float v3);
+    void setUniform1i(const std::string &name, int v);
+    void setUniform1f(const std::string &name, float v);
 
 private:
     unsigned int getUniformLocation(const std::string &name);
