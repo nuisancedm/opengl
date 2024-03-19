@@ -1,5 +1,8 @@
 #pragma once
 #include <string>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 struct ShaderProgramSource {
     std::string VectexSource;
@@ -23,6 +26,7 @@ public:
     void setUniform4f(const std::string &name, float v0, float v1, float v2, float v3);
     void setUniform1i(const std::string &name, int v);
     void setUniform1f(const std::string &name, float v);
+    void setUniformMatrix4f(const std::string &name, const glm::mat4& v);
 
 private:
     unsigned int getUniformLocation(const std::string &name);

@@ -8,33 +8,25 @@ project(opengl)
 include_directories(include src/vender)
 link_directories(lib)
 
+# 使用GLOB收集文件，但要注意，这不会自动感知新文件的添加
+file(GLOB MYGL_SOURCES "src/myGL/*.cpp" "src/glad.c")
+file(GLOB IMGUI_SOURCES "src/vender/imGUI/*.cpp")
 
-set(MYGL_SOURCES
-    src/glad.c
-    src/myGL/Renderer.cpp
-    src/myGL/VertexBuffer.cpp
-    src/myGL/IndexBuffer.cpp
-    src/myGL/VertexArray.cpp
-    src/myGL/Shader.cpp
-    src/myGL/Texture.cpp
-)
+# 创建两个静态库：MYGL和IMGUI
+add_library(MYGL STATIC ${MYGL_SOURCES})
+add_library(IMGUI STATIC ${IMGUI_SOURCES})
 
-set(IMGUI_SOURCES
-    src/vender/imGUI/imgui.cpp    
-    src/vender/imGUI/imgui_demo.cpp
-    src/vender/imGUI/imgui_draw.cpp
-    src/vender/imGUI/imgui_tables.cpp
-    src/vender/imGUI/imgui_widgets.cpp 
-    src/vender/imGUI/imgui_impl_glfw.cpp
-    src/vender/imGUI/imgui_impl_opengl3.cpp
-)
+# 为MYGL和IMGUI设置包含目录
+target_include_directories(MYGL PUBLIC "include" "src/vender")
+target_include_directories(IMGUI PUBLIC "include" "src/vender")
 
-#add_executable(opengl src/glad.c src/o001_window.cpp)
-#add_executable(opengl src/glad.c src/o002_triangles.cpp)
-#add_executable(opengl src/glad.c src/o003_twoTriangles.cpp)
-#add_executable(opengl  src/o004_abstraction.cpp ${MYGL_SOURCES}) 
-#add_executable(opengl  src/o005_texture.cpp ${MYGL_SOURCES})  
-add_executable(opengl  src/o006_imgui.cpp ${MYGL_SOURCES} ${IMGUI_SOURCES})  
+#add_executable(opengl src/o001_window.cpp)
+#add_executable(opengl src/o002_triangles.cpp)
+#add_executable(opengl src/o003_twoTriangles.cpp)
+#add_executable(opengl  src/o004_abstraction.cpp) 
+#add_executable(opengl  src/o005_texture.cpp)  
+#add_executable(opengl  src/o006_imgui.cpp)  
+add_executable(opengl  src/o007_transformation.cpp)  
 
 
-target_link_libraries(opengl glfw3) 
+target_link_libraries(opengl MYGL IMGUI glfw3)
