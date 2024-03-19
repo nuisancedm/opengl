@@ -13,24 +13,31 @@
 #include "myGL/Shader.h"
 #include "myGL/Texture.h"
 
+#include "imGUI/imgui.h"
+#include "imGUI/imgui_impl_glfw.h"
+#include "imGUI/imgui_impl_opengl3.h"
+
 //@@ new file! to add images as a texture.
 // #define STB_IMAGE_IMPLEMENTATION
 // #include "stb_image.h"
 
 float mixValue = 0.4f;
 
-void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+void framebuffer_size_callback(GLFWwindow *window, int width, int height)
+{
     glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow *window) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+void processInput(GLFWwindow *window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    {
         glfwSetWindowShouldClose(window, true);
-    } 
+    }
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
     {
         mixValue += 0.01f; // change this value accordingly (might be too slow or too fast based on system hardware)
-        if(mixValue >= 1.0f)
+        if (mixValue >= 1.0f)
             mixValue = 1.0f;
     }
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
@@ -41,7 +48,8 @@ void processInput(GLFWwindow *window) {
     }
 }
 
-int main() {
+int main()
+{
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -52,7 +60,8 @@ int main() {
 #endif
     GLFWwindow *window = glfwCreateWindow(800, 600, "@pengl", NULL, NULL);
 
-    if (window == NULL) {
+    if (window == NULL)
+    {
         std::cout << "Failed to init GLFW window!" << std::endl;
         glfwTerminate();
         return -1;
@@ -60,13 +69,14 @@ int main() {
 
     glfwMakeContextCurrent(window);
 
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
         std::cout << "Failed to init GLAD" << std::endl;
         return -1;
     }
 
     std::cout << glGetString(GL_VERSION) << std::endl;
-    std::cout << "[MESSAGE]: executable launched from file 005" << std::endl;
+    std::cout << "[MESSAGE]: executable launched from file 006" << std::endl;
 
     //@@ print the max number of textures the graphic card support.
     int maxTextureUnits;
@@ -100,27 +110,6 @@ int main() {
         layout.Push(GL_FLOAT, 2); //@@ 2 text coords
         va.addBuffer(vb, layout);
 
-        //@@ codes below were abstracted
-        // int width, height, nrChannels;
-        // unsigned char *data = stbi_load("../src/texture/container.jpg", &width, &height, &nrChannels, 0);
-        // unsigned int texture;
-        // glGenTextures(1, &texture);
-        // glBindTexture(GL_TEXTURE_2D, texture);
-
-        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        // if (data) {
-        //     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        //     glGenerateMipmap(GL_TEXTURE_2D);
-        // } else {
-        //     std::cout << "Failed to load texture" << std::endl;
-        // }
-
-        // stbi_image_free(data);
-
         Texture texture1("../src/texture/container.jpg", REPEAT, LINEAR, false);
         Texture texture2("../src/texture/hachiware.jpg", REPEAT, LINEAR, true);
 
@@ -129,8 +118,6 @@ int main() {
         shader.setUniform1i("texture0", 0);
         shader.setUniform1i("texture1", 1);
 
-        
-
         vb.unbind();
         va.unbind();
         ib.unbind();
@@ -138,8 +125,34 @@ int main() {
 
         Renderer renderer;
 
-        while (!glfwWindowShouldClose(window)) {
+        //@@ ======== imgui magic code start ============
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGuiIO &io = ImGui::GetIO();
+        (void)io;
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
+        ImGui::StyleColorsDark();
+        ImGui_ImplGlfw_InitForOpenGL(window, true);
+        ImGui_ImplOpenGL3_Init("#version 330");
+        //@@ ======== imgui magic code end ==============
+
+        while (!glfwWindowShouldClose(window))
+        {
             processInput(window);
+            //@@ ======== imgui magic code start ============
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+            {
+                ImGui::Begin("Hello, world!");                                                                     // Create a window called "Hello, world!" and append into it.
+                ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate); //@@ fps
+                ImGui::Text("change the mixValue");                                                                // Display some text (you can use a format strings too)
+                ImGui::SliderFloat("mixValue", &mixValue, 0.0f, 1.0f);                                             // Edit 1 float using a slider from 0.0f to 1.0f
+                ImGui::End();
+            }
+            ImGui::Render();
+            //@@ ======== imgui magic code end ==============
 
             renderer.clear();
 
@@ -151,10 +164,21 @@ int main() {
 
             renderer.draw(va, ib, shader);
 
+            //@@ ======== imgui magic code start ============
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+            //@@ ======== imgui magic code end ==============
+
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
     }
+    //@@ ======== imgui magic code start ============
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+    //@@ ======== imgui magic code end ==============
+
+    glfwDestroyWindow(window);
     glfwTerminate();
 
     return 0;

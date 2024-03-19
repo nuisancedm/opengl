@@ -8,6 +8,7 @@
 #include "myGL/Renderer.h"
 #include "myGL/IndexBuffer.h"
 #include "myGL/VertexBuffer.h"
+#include "myGL/VertexBufferLayout.h"
 #include "myGL/VertexArray.h"
 #include "myGL/Shader.h"
 

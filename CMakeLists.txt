@@ -33,7 +33,8 @@ set(IMGUI_SOURCES
 #add_executable(opengl src/glad.c src/o002_triangles.cpp)
 #add_executable(opengl src/glad.c src/o003_twoTriangles.cpp)
 #add_executable(opengl  src/o004_abstraction.cpp ${MYGL_SOURCES}) 
-add_executable(opengl  src/o005_texture.cpp ${MYGL_SOURCES} ${IMGUI_SOURCES})  
+#add_executable(opengl  src/o005_texture.cpp ${MYGL_SOURCES})  
+add_executable(opengl  src/o006_imgui.cpp ${MYGL_SOURCES} ${IMGUI_SOURCES})  
 
 
 target_link_libraries(opengl glfw3) 

@@ -60,7 +60,8 @@ void Texture::parseTexture() {
     stbi_image_free(data);
 };
 
-void Texture::bind() const {
+void Texture::bind(unsigned int slot) const {
+    glActiveTexture(GL_TEXTURE0+slot);
     glBindTexture(GL_TEXTURE_2D, m_RendererID);
 }
 

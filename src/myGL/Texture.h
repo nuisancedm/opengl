@@ -27,6 +27,6 @@ public:
 
 
     void parseTexture();
-    void bind() const;
+    void bind(unsigned int slot =0) const;
     void unbind() const;
 };
