@@ -29,7 +29,9 @@ target_include_directories(IMGUI PUBLIC "include" "src/vender")
 #add_executable(opengl  src/o007_transformation.cpp)  
 #add_executable(opengl  src/o008_coordinates.cpp)
 # add_executable(opengl  src/o009_camera.cpp)
-add_executable(opengl  src/o010_color.cpp)
+# add_executable(opengl  src/o010_color.cpp)
+add_executable(opengl  src/o011_phongLighting.cpp)
+
 
 
 target_link_libraries(opengl MYGL IMGUI glfw3)
