@@ -30,7 +30,7 @@ int main() {
     GLFWwindow *window = glfwCreateWindow(SRC_WIDTH, SRC_HEIGHT, "@pengl", NULL, NULL);
 
     if (window == NULL) {
-        std::cout << "Failed to init GLFW window!" << std::endl;
+        std::cout << "Failed to init GLFW window!" << std::endl; 
         glfwTerminate();
         return -1;
     }
