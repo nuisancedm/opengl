@@ -60,8 +60,14 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string &source)
         glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
         char *message = (char *)alloca(length * sizeof(char));
         glGetShaderInfoLog(id, length, &length, message);
-        std::cout << "[ERROR]SHADER_COMPILATION_FAILED: "
-                  << " " << message << std::endl;
+        if (type == GL_VERTEX_SHADER) {
+            std::cout << "[ERROR]VERTEX_SHADER_COMPILATION_FAILED: "
+                      << " " << message << std::endl;
+        }
+        if (type == GL_FRAGMENT_SHADER) {
+            std::cout << "[ERROR]FRAGMENT_SHADER_COMPILATION_FAILED: "
+                      << " " << message << std::endl;
+        }
         glDeleteShader(id);
         return 0;
     }
@@ -107,14 +113,14 @@ void Shader::setUniform1f(const std::string &name, float v) {
     GLCall(glUniform1f(getUniformLocation(name), v));
 };
 
-void Shader::setUniformMatrix4f(const std::string &name, const glm::mat4& m) {
-    GLCall(glUniformMatrix4fv(getUniformLocation(name), 1,GL_FALSE, glm::value_ptr(m)));
+void Shader::setUniformMatrix4f(const std::string &name, const glm::mat4 &m) {
+    GLCall(glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(m)));
 };
 
 unsigned int Shader::getUniformLocation(const std::string &name) {
     GLCall(unsigned int location = glGetUniformLocation(m_RendererID, name.c_str()));
     if (location == -1) {
-        std::cout << "[WARNING]uniform " << name << "doesn't exists" << std::endl;
+        std::cout << "[WARNING]uniform " << name << " doesn't exists" << std::endl;
     }
     return location;
 };

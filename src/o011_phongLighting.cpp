@@ -17,6 +17,7 @@
 #include "global.h"
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+glm::vec3 lightpos = glm::vec3(1.0f, 1.0f, 1.0f);
 
 float BoxVertices[] = {
     -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
@@ -61,9 +62,7 @@ float BoxVertices[] = {
     -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
     -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f};
 
-int main()
-{
-
+int main() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -74,8 +73,7 @@ int main()
 #endif
     GLFWwindow *window = glfwCreateWindow(SRC_WIDTH, SRC_HEIGHT, "@pengl", NULL, NULL);
 
-    if (window == NULL)
-    {
+    if (window == NULL) {
         std::cout << "Failed to init GLFW window!" << std::endl;
         glfwTerminate();
         return -1;
@@ -83,8 +81,7 @@ int main()
 
     glfwMakeContextCurrent(window);
 
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Failed to init GLAD" << std::endl;
         return -1;
     }
@@ -147,9 +144,9 @@ int main()
         float lightX = 1.2f;
         float lightY = 1.0f;
         float lightZ = 2.0f;
+        bool isRollingBox = true;
 
-        while (!glfwWindowShouldClose(window))
-        {
+        while (!glfwWindowShouldClose(window)) {
             float currentFrame = glfwGetTime();
             deltaTime = currentFrame - lastFrame;
             lastFrame = currentFrame;
@@ -159,16 +156,23 @@ int main()
 
             glm::mat4 view = camera.GetViewMatrix();
             glm::mat4 projection = glm::perspective(glm::radians(camera.fov), float(SRC_WIDTH) / float(SRC_HEIGHT), 0.1f, 100.0f);
-            glm::mat4 model = glm::mat4(1.0f);
+            glm::mat4 model_light = glm::mat4(1.0f);
+            glm::mat4 model_box = glm::mat4(1.0f);
 
             //@@ draw box
             shader.bind();
             shader.setUniform4f("objectColor", 1.0f, 0.5f, 0.31f, 1.0f);
             shader.setUniform4f("lightColor", 1.0f, 1.0f, 1.0f, 1.0f);
-            shader.setUniform3f("lightPos", lightX, lightY, lightZ);
+            shader.setUniform3f("lightPos", float(lightpos.x), float(lightpos.y), float(lightpos.z));
+            shader.setUniform3f("viewPos", float(camera.Position.x), float(camera.Position.y), float(camera.Position.z));
             shader.setUniformMatrix4f("view", view);
             shader.setUniformMatrix4f("projection", projection);
-            shader.setUniformMatrix4f("model", model);
+            if (isRollingBox) {
+                model_box = glm::rotate(model_box, (float)glfwGetTime() * glm::radians(30.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+                shader.setUniformMatrix4f("model", model_box);
+            } else {
+                shader.setUniformMatrix4f("model", model_box);
+            }
             va_cube.bind();
             glDrawArrays(GL_TRIANGLES, 0, 36);
 
@@ -176,9 +180,9 @@ int main()
             light_shader.bind();
             light_shader.setUniformMatrix4f("view", view);
             light_shader.setUniformMatrix4f("projection", projection);
-            model = glm::translate(model, glm::vec3(lightX,lightY,lightZ));
-            model = glm::scale(model, glm::vec3(0.01f)); // a smaller cube
-            light_shader.setUniformMatrix4f("model", model);
+            model_light = glm::translate(model_light, glm::vec3(float(lightpos.x), float(lightpos.y), float(lightpos.z)));
+            model_light = glm::scale(model_light, glm::vec3(0.1f)); // a smaller cube
+            light_shader.setUniformMatrix4f("model", model_light);
             va_light.bind();
             glDrawArrays(GL_TRIANGLES, 0, 36);
 
@@ -190,10 +194,12 @@ int main()
                 ImGui::Begin("Control Pannel");                                                        // Create a window called "Hello, world!" and append into it.
                 ImGui::Text("average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate); //@@ fps
                 ImGui::Text("none");                                                                   // Display some text (you can use a format strings too)
-                ImGui::SliderFloat("lightX", &lightX, -5.0f, 5.0f);
-                ImGui::SliderFloat("lightY", &lightY, -5.0f, 5.0f);
-                ImGui::SliderFloat("lightZ", &lightZ, -5.0f, 5.0f);
+                ImGui::SliderFloat("lightX", &lightpos.x, -5.0f, 5.0f);
+                ImGui::SliderFloat("lightY", &lightpos.y, -5.0f, 5.0f);
+                ImGui::SliderFloat("lightZ", &lightpos.z, -5.0f, 5.0f);
                 ImGui::SliderFloat("fov", &camera.fov, 1.0f, 179.0f);
+                ImGui::Checkbox("Roll", &isRollingBox); 
+                
                 ImGui::End();
             }
             ImGui::Render();
@@ -213,16 +219,13 @@ int main()
     return 0;
 }
 
-void framebuffer_size_callback(GLFWwindow *window, int width, int height)
-{
+void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow *window)
-{
+void processInput(GLFWwindow *window) {
     //@@ Esc to close the window
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
 
@@ -240,21 +243,17 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
         camera.ProcessKeyboard(UP, deltaTime);
 
-    if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS)
-    {
+    if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS) {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         firstMouse = true;
     }
-    if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_RELEASE)
-    {
+    if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_RELEASE) {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
 }
 
-void mouse_callback(GLFWwindow *window, double xpos, double ypos)
-{
-    if (firstMouse)
-    {
+void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
+    if (firstMouse) {
         lastX = xpos;
         lastY = ypos;
         firstMouse = false;
@@ -266,10 +265,8 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
     lastY = ypos;
 
     camera.ProcessMouseMovement(xoffset, yoffset);
-    
 }
 
-void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
-{
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
     camera.ProcessMouseScroll(yoffset);
 }
