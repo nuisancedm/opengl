@@ -27,6 +27,10 @@ public:
 
 
     void parseTexture();
+    std::string getFileExtension(const std::string& filepath);
+    void loadPNG();
+    void loadJPEG();
+    void setTextureParameters();
     void bind(unsigned int slot =0) const;
     void unbind() const;
 };

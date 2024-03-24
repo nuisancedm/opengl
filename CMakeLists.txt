@@ -20,17 +20,21 @@ add_library(IMGUI STATIC ${IMGUI_SOURCES})
 target_include_directories(MYGL PUBLIC "include" "src/vender")
 target_include_directories(IMGUI PUBLIC "include" "src/vender")
 
-#add_executable(opengl src/o001_window.cpp)
-#add_executable(opengl src/o002_triangles.cpp)
-#add_executable(opengl src/o003_twoTriangles.cpp)
-#add_executable(opengl  src/o004_abstraction.cpp) 
-#add_executable(opengl  src/o005_texture.cpp)  
-#add_executable(opengl  src/o006_imgui.cpp)  
-#add_executable(opengl  src/o007_transformation.cpp)  
-#add_executable(opengl  src/o008_coordinates.cpp)
+# add_executable(opengl src/o001_window.cpp)
+# add_executable(opengl src/o002_triangles.cpp)
+# add_executable(opengl src/o003_twoTriangles.cpp)
+# add_executable(opengl  src/o004_abstraction.cpp) 
+# add_executable(opengl  src/o005_texture.cpp)  
+# add_executable(opengl  src/o006_imgui.cpp)  
+# add_executable(opengl  src/o007_transformation.cpp)  
+# add_executable(opengl  src/o008_coordinates.cpp)
 # add_executable(opengl  src/o009_camera.cpp)
 # add_executable(opengl  src/o010_color.cpp)
-add_executable(opengl  src/o011_phongLighting.cpp)
+# add_executable(opengl  src/o011_phongLighting.cpp)
+# add_executable(opengl  src/o012_material.cpp)
+add_executable(opengl  src/o013_lightingMaps.cpp)
+
+
 
 
 
