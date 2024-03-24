@@ -3,7 +3,7 @@
 #include "Texture.h"
 #include "Renderer.h"
 #include <iostream>
-#include <algorithm> // C++11中的头文件，用于字符串操作
+#include <algorithm>
 
 Texture::Texture(const std::string filepath, textureWrapper wrapper, textureFilter filter, bool y_flip) :
     m_Filepath(filepath), m_RendererID(0), m_Wrapper(wrapper), m_Filter(filter), m_Yflip(y_flip) {
@@ -44,7 +44,6 @@ void Texture::loadPNG() {
     }
     unsigned char *data = stbi_load(m_Filepath.c_str(), &m_Width, &m_Height, &m_Channels, STBI_rgb_alpha);
     if (data) {
-        // 设置纹理参数和生成纹理
         setTextureParameters();
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);

@@ -25,7 +25,6 @@ public:
     Texture(const std::string filepath,textureWrapper wraper, textureFilter filter, const bool y_flip);
     ~Texture();
 
-
     void parseTexture();
     std::string getFileExtension(const std::string& filepath);
     void loadPNG();
