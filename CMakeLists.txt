@@ -32,7 +32,9 @@ target_include_directories(IMGUI PUBLIC "include" "src/vender")
 # add_executable(opengl  src/o010_color.cpp)
 # add_executable(opengl  src/o011_phongLighting.cpp)
 # add_executable(opengl  src/o012_material.cpp)
-add_executable(opengl  src/o013_lightingMaps.cpp)
+# add_executable(opengl  src/o013_lightingMaps.cpp)
+add_executable(opengl  src/o014_lightcaster.cpp)
+
 
 
 
