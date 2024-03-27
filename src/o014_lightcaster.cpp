@@ -240,6 +240,14 @@ int main() {
             shader.setUniform1f("pointLights[2].quadratic",0.032f);
             shader.setUniform1f("pointLights[3].quadratic",0.032f);
 
+            shader.setUniform3f("spotLight.position", camera.Position.x, camera.Position.y, camera.Position.z);
+            shader.setUniform3f("spotLight.direction", camera.Front.x, camera.Front.y, camera.Front.z);
+            shader.setUniform1f("spotLight.cutoff", glm::cos(glm::radians(12.5f)));
+            shader.setUniform3f("spotLight.ambient", 0.2f, 0.2f, 0.2f);
+            shader.setUniform3f("spotLight.diffuse", 0.5f, 0.5f, 0.5f);
+            shader.setUniform3f("spotLight.specular", 1.0f, 1.0f, 1.0f);
+
+
             va_cube.bind();
             texture1.bind(0);
             texture2.bind(1);
