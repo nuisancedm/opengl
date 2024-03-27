@@ -175,6 +175,7 @@ int main() {
         float lightY = 1.0f;
         float lightZ = 2.0f;
         bool isRollingBox = true;
+        float light_color[4][4] = {{1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}};
 
         while (!glfwWindowShouldClose(window)) {
             float currentFrame = glfwGetTime();
@@ -208,21 +209,21 @@ int main() {
             shader.setUniform3f("pointLights[1].position", float(pointLightPositions[1].x),float(pointLightPositions[1].y),float(pointLightPositions[1].z));
             shader.setUniform3f("pointLights[2].position", float(pointLightPositions[2].x),float(pointLightPositions[2].y),float(pointLightPositions[2].z));
             shader.setUniform3f("pointLights[3].position", float(pointLightPositions[3].x),float(pointLightPositions[3].y),float(pointLightPositions[3].z));
-            
-            shader.setUniform3f("pointLights[0].ambient",0.2f, 0.2f, 0.2f);
-            shader.setUniform3f("pointLights[1].ambient",0.2f, 0.2f, 0.2f);
-            shader.setUniform3f("pointLights[2].ambient",0.2f, 0.2f, 0.2f);
-            shader.setUniform3f("pointLights[3].ambient",0.2f, 0.2f, 0.2f);
 
-            shader.setUniform3f("pointLights[0].diffuse",0.5f, 0.5f, 0.5f);
-            shader.setUniform3f("pointLights[1].diffuse",0.5f, 0.5f, 0.5f);
-            shader.setUniform3f("pointLights[2].diffuse",0.5f, 0.5f, 0.5f);
-            shader.setUniform3f("pointLights[3].diffuse",0.5f, 0.5f, 0.5f);
+            shader.setUniform3f("pointLights[0].ambient", 0.2f * light_color[0][0], 0.2f * light_color[0][1], 0.2f * light_color[0][2]);
+            shader.setUniform3f("pointLights[1].ambient", 0.2f * light_color[1][0], 0.2f * light_color[1][1], 0.2f * light_color[1][2]);
+            shader.setUniform3f("pointLights[2].ambient", 0.2f * light_color[2][0], 0.2f * light_color[2][1], 0.2f * light_color[2][2]);
+            shader.setUniform3f("pointLights[3].ambient", 0.2f * light_color[3][0], 0.2f * light_color[3][1], 0.2f * light_color[3][2]);
 
-            shader.setUniform3f("pointLights[0].specular",1.0f, 1.0f, 1.0f);
-            shader.setUniform3f("pointLights[1].specular",1.0f, 1.0f, 1.0f);
-            shader.setUniform3f("pointLights[2].specular",1.0f, 1.0f, 1.0f);
-            shader.setUniform3f("pointLights[3].specular",1.0f, 1.0f, 1.0f);
+            shader.setUniform3f("pointLights[0].diffuse", 0.5f * light_color[0][0], 0.5f * light_color[0][1], 0.5f * light_color[0][2]);
+            shader.setUniform3f("pointLights[1].diffuse", 0.5f * light_color[1][0], 0.5f * light_color[1][1], 0.5f * light_color[1][2]);
+            shader.setUniform3f("pointLights[2].diffuse", 0.5f * light_color[2][0], 0.5f * light_color[2][1], 0.5f * light_color[2][2]);
+            shader.setUniform3f("pointLights[3].diffuse", 0.5f * light_color[3][0], 0.5f * light_color[3][1], 0.5f * light_color[3][2]);
+
+            shader.setUniform3f("pointLights[0].specular", 1.0f * light_color[0][0], 1.0f * light_color[0][1], 1.0f * light_color[0][2]);
+            shader.setUniform3f("pointLights[1].specular", 1.0f * light_color[1][0], 1.0f * light_color[1][1], 1.0f * light_color[1][2]);
+            shader.setUniform3f("pointLights[2].specular", 1.0f * light_color[2][0], 1.0f * light_color[2][1], 1.0f * light_color[2][2]);
+            shader.setUniform3f("pointLights[3].specular", 1.0f * light_color[3][0], 1.0f * light_color[3][1], 1.0f * light_color[3][2]);
 
             shader.setUniform1f("pointLights[0].constant",1.0f);
             shader.setUniform1f("pointLights[1].constant",1.0f);
@@ -265,7 +266,6 @@ int main() {
 
             }
             
-            
 
             //@@ draw light
             light_shader.bind();
@@ -274,6 +274,7 @@ int main() {
             light_shader.setUniformMatrix4f("projection", projection);
             for (int i = 0; i < 4; i++)
             {   
+                light_shader.setUniform3f("lightColor", float(light_color[i][0]),float(light_color[i][1]),float(light_color[i][2]));
                 glm::mat4 model_light = glm::mat4(1.0f);
                 model_light = glm::translate(model_light, glm::vec3(float(pointLightPositions[i].x), float(pointLightPositions[i].y), float(pointLightPositions[i].z)));
                 model_light = glm::scale(model_light, glm::vec3(0.1f)); // a smaller cube
@@ -287,13 +288,43 @@ int main() {
             ImGui::NewFrame();
             {
                 ImGui::Begin("Control Pannel");                                                        // Create a window called "Hello, world!" and append into it.
-                ImGui::Text("average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate); //@@ fps
-                ImGui::Text("none");                                                                   // Display some text (you can use a format strings too)
-                ImGui::SliderFloat("lightX", &lightpos.x, -5.0f, 5.0f);
-                ImGui::SliderFloat("lightY", &lightpos.y, -5.0f, 5.0f);
-                ImGui::SliderFloat("lightZ", &lightpos.z, -5.0f, 5.0f);
-                ImGui::SliderFloat("fov", &camera.fov, 1.0f, 179.0f);
-                ImGui::Checkbox("Roll", &isRollingBox); 
+                ImGui::Text("average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate); //@@ fps                                                              // Display some text (you can use a format strings too)
+                
+                ImGui::Checkbox("Roll", &isRollingBox);
+
+                if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen)) // 默认展开
+                {
+                    ImGui::SliderFloat("fov", &camera.fov, 1.0f, 179.0f);
+                }
+
+                if (ImGui::CollapsingHeader("Light_0"))
+                {
+                    ImGui::SliderFloat("X_light0", &pointLightPositions[0].x, -5.0f, 5.0f);
+                    ImGui::SliderFloat("Y_light0", &pointLightPositions[0].y, -5.0f, 5.0f);
+                    ImGui::SliderFloat("Z_light0", &pointLightPositions[0].z, -5.0f, 5.0f);
+                    ImGui::ColorEdit4("Color_light0", light_color[0]);
+                }
+                if (ImGui::CollapsingHeader("Light_1"))
+                {
+                    ImGui::SliderFloat("X_light1", &pointLightPositions[1].x, -5.0f, 5.0f);
+                    ImGui::SliderFloat("Y_light1", &pointLightPositions[1].y, -5.0f, 5.0f);
+                    ImGui::SliderFloat("Z_light1", &pointLightPositions[1].z, -5.0f, 5.0f);
+                    ImGui::ColorEdit4("Color_light1", light_color[1]);
+                }
+                if (ImGui::CollapsingHeader("Light_2"))
+                {
+                    ImGui::SliderFloat("X_light2", &pointLightPositions[2].x, -5.0f, 5.0f);
+                    ImGui::SliderFloat("Y_light2", &pointLightPositions[2].y, -5.0f, 5.0f);
+                    ImGui::SliderFloat("Z_light2", &pointLightPositions[2].z, -5.0f, 5.0f);
+                    ImGui::ColorEdit4("Color_light2", light_color[2]);
+                }
+                if (ImGui::CollapsingHeader("Light_3"))
+                {
+                    ImGui::SliderFloat("X_light3", &pointLightPositions[3].x, -5.0f, 5.0f);
+                    ImGui::SliderFloat("Y_light3", &pointLightPositions[3].y, -5.0f, 5.0f);
+                    ImGui::SliderFloat("Z_light3", &pointLightPositions[3].z, -5.0f, 5.0f);
+                    ImGui::ColorEdit4("Color_light3", light_color[3]);
+                }
                 ImGui::End();
             }
             ImGui::Render();
@@ -339,10 +370,13 @@ void processInput(GLFWwindow *window) {
 
     if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS) {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        glfwSetScrollCallback(window, nullptr);
         firstMouse = true;
     }
     if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_RELEASE) {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetScrollCallback(window, scroll_callback);
+        
     }
 }
 
